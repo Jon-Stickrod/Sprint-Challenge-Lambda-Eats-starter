@@ -4,6 +4,7 @@ import './App.css';
 import styled from "styled-components";
 import { useState, useEffect } from "react";
 import * as yup from "yup";
+import axios from "axios";
 
 const PizzaPage = styled.div`
 display: flex;
@@ -12,12 +13,16 @@ justify-content: center;
 `;
 
 const formSchema = yup.object().shape({
-
+    name: yup.string().required("Sorry bucko, name is required"),
+    size: yup.string().oneOf(["Small", "Medium", "Large", "XL"]),
+    sauce: yup.string().oneOf(["red", "bbq", "white"])
+    
 });
 
 
 
 function Pizza() {
+    const [buttonDisabled, setButtonDisabled] = useState(true);
 
     const [formState, setFormState] = useState({
         name: "",
@@ -27,27 +32,100 @@ function Pizza() {
         instructions: ""
       });
 
+      const [errors, setErrors] = useState({
+        name: "",
+        size: "",
+        red: "",
+        garlic: "",
+        bbq: "",
+        spinach: "",
+        instructions: ""
+      });
+    const [user, setUser] = useState([]);
+    const [post, setPost] = useState([]); 
+    
+    useEffect(() => {
+        formSchema.isValid(formState).then(valid => {
+          setButtonDisabled(!valid);
+        });
+      }, [formState]);
+
+    const formSubmit = e => {
+        e.preventDefault();
+        axios
+          .post("https://reqres.in/api/users", formState)
+          .then(res => {
+            setPost(res.data);
+            setUser(res.data);
+            console.log("good job bucko", post);
+    
+            setFormState({
+              name: "",
+              size: "",
+              red: "",
+              garlic: "",
+              bbq: "",
+              spinach: "",
+              instructions: ""
+            });
+          })
+          .catch(err => console.log(err.response));
+      };
+
+    const validateChange = e => {
+        yup
+          .reach(formSchema, e.target.name)
+          .validate(e.target.value)
+          .then(valid => {
+            setErrors({
+              ...errors,
+              [e.target.name]: ""
+            });
+          })
+          .catch(err => {
+            setErrors({
+              ...errors,
+              [e.target.name]: err.errors[0]
+            });
+          });
+      };
+
+
+    const inputChange = e => {
+        e.persist();
+        const newFormData = {
+          ...formState,
+          [e.target.name]:
+            e.target.type === "checkbox" ? e.target.checked : e.target.value
+        };
+        validateChange(e);
+        setFormState(newFormData);
+      };
 
   return (
       <PizzaPage className='pizzaPage'>
-        <div className="Pizza">
+        <form onSubmit={formSubmit} className="Pizza">
             <label htmlFor="name">Please enter your name
                 <input
-                id="title"
+                id="name"
+                name="name"
                 type="text"
-                />
+                value={formState.name}
+                onChange={inputChange}
+                />{errors.name.length > 0 ? (
+                    <p className="error">{errors.name}</p>) : null}
             </label>
             <label> Pizza size
-                <select>
+                <select id="size" name="size" onChange={inputChange}>
                     <option value="">--Please select your size--</option>
                     <option value="Small">Small</option>
                     <option value="Medium">Medium</option>
                     <option value="Large">Large</option>
-                    <option value="Extra-Large">Extra-Large</option>
+                    <option value="XL">XL</option>
                 </select>
             </label>
             <label>Sauce Qoice
-                <select> 
+                <select id="sauce" name="sauce" onChange={inputChange}> 
                     <option value="">--Please select your sauce--</option>
                     <option value="red">red</option>
                     <option value="bbq">bbq</option>
@@ -83,13 +161,15 @@ function Pizza() {
                 <textarea />
             </label>
             
-            <button>Submit</button>
+            <button disabled={buttonDisabled} onChange={inputChange}>Submit</button>
+                
+            <pre>{JSON.stringify(post, null, 2)}</pre>
+            <pre>{JSON.stringify(user.name, null, 2)}</pre>
 
 
 
 
-
-        </div> 
+        </form> 
       </PizzaPage>
 
   );
