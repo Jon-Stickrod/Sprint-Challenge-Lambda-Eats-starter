@@ -163,7 +163,7 @@ function Pizza() {
                 <textarea id="instructions" name="instructions" onChange={inputChange}/>
             </label>
             
-            <button disabled={buttonDisabled} onChange={inputChange}>Submit</button>
+            <button type="submit" disabled={buttonDisabled} onChange={inputChange}>Submit</button>
                 
             <pre>{JSON.stringify(post, null, 2)}</pre>
             <pre>{JSON.stringify(user.name, null, 2)}</pre>
