@@ -15,7 +15,9 @@ justify-content: center;
 const formSchema = yup.object().shape({
     name: yup.string().required("Sorry bucko, name is required"),
     size: yup.string().oneOf(["Small", "Medium", "Large", "XL"]),
-    sauce: yup.string().oneOf(["red", "bbq", "white"])
+    sauce: yup.string().oneOf(["red", "bbq", "white"]),
+    instructions: yup.string()
+
     
 });
 
@@ -158,7 +160,7 @@ function Pizza() {
             </div>
             
             <label>Special Instructions?
-                <textarea />
+                <textarea id="instructions" name="instructions" onChange={inputChange}/>
             </label>
             
             <button disabled={buttonDisabled} onChange={inputChange}>Submit</button>
