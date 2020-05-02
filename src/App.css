@@ -27,6 +27,17 @@
 .App-link {
   color: #61dafb;
 }
+.Pizza{
+  display: flex;
+  margin: auto 0%;
+  flex-direction: column;
+  border: black solid 2px;
+  width: 50%;
+  align-items: center;
+
+
+  
+}
 
 @keyframes App-logo-spin {
   from {
